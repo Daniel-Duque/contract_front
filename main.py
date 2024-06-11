@@ -28,20 +28,33 @@ filtrado1=pd.read_csv(
 filtrado1=filtrado1.rename(columns={"predict": "Valor Proyectado", "value_thousand_dolar": "Valor real","likelihood":"Similitud de valor"})
 extrange="Tamaño valor extraño"
 filtrado1[extrange]=(filtrado1["Valor real"]-filtrado1["Valor Proyectado"]*2)
+filtrado1["range-"]=filtrado1["Valor Proyectado"]/2
 st.title("contratación pública")
 
 tab0,tab1,tab2,tab3 = st.tabs(['selección','gastos según diferencias',"gastos e ingresos","ingresos"])
 with tab0:
-    muni = st.selectbox("Ciudad Entidad",
-       filtrado1["Ciudad Entidad"])
+    
     
     depto=st.selectbox("Departamento Entidad",
-                       filtrado1["Departamento Entidad"])
-    resulting=filtrado1[filtrado1["Ciudad Entidad"]=="Ciudad Entidad"]
+                       pd.unique(filtrado1["Departamento Entidad"]))
+    
+
+    resulting=filtrado1[filtrado1["Departamento Entidad"]==depto]
+    
+    muni = st.selectbox("Ciudad Entidad",
+       pd.unique(resulting["Ciudad Entidad"]))    
+    
+  
+    
+    resulting=filtrado1[filtrado1["Ciudad Entidad"]==muni].sort_values("Tamaño valor extraño",ascending=False)
+
+    
     resulting=resulting[["Entidad","Descripción del Procedimiento","Tipo de Contrato",
-                         "Valor real","Valor Proyectado",extrange,"Similitud de valor"]]
-    resulting=resulting[resulting["Departamento Entidad"]==depto].sort_values("Tamaño valor extraño")
-    st.dataframe(resulting.style.background_gradient(axis=None, vmin=1, vmax=5, cmap="YlGnBu"))
+                         "Valor real","Valor Proyectado",extrange,"Similitud de valor"]]      
+
+    
+    
+    st.dataframe(resulting.style.background_gradient(axis=None, cmap="Reds"))
     
     
     
